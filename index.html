@@ -11,7 +11,7 @@
         fullName: "Forrest Gump",
         organization: "Bubba Gump Shrimp Co.",
         title: "Shrimp Man",
-        photoUrl: "https://upload.wikimedia.org/wikipedia/commons/8/87/My_Dog_%2861220578%29.jpeg",
+        photoUrl: "https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg?auto=compress&cs=tinysrgb&w=800",
         workPhone: "(111) 555-1212",
         homePhone: "(404) 555-1212",
         workAddress: {
@@ -63,7 +63,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'contact.vcf';
+            a.download = 'contact.vcf'; // Ensure the file has a .vcf extension
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -84,6 +84,6 @@
   </script>
 </head>
 <body>
-  <h1>Downloading vCard :) ...</h1>
+  <h1>Downloading vCard...</h1>
 </body>
 </html>
