@@ -32,13 +32,12 @@
         revision: "2008-04-24T19:52:43Z"
       };
 
-      // Fetch the image and convert it to base64
       fetch(userInfo.photoUrl)
         .then(response => response.blob())
         .then(blob => {
           const reader = new FileReader();
           reader.onloadend = () => {
-            const base64data = reader.result.split(',')[1]; // Remove the data URL prefix
+            const base64data = reader.result.split(',')[1];
             const vCard = [
               'BEGIN:VCARD',
               'VERSION:3.0',
@@ -50,36 +49,43 @@
               `TEL;TYPE=WORK,VOICE:${userInfo.workPhone.trim()}`,
               `TEL;TYPE=HOME,VOICE:${userInfo.homePhone.trim()}`,
               `ADR;TYPE=WORK,PREF:;;${userInfo.workAddress.street.trim()};${userInfo.workAddress.city.trim()};${userInfo.workAddress.state.trim()};${userInfo.workAddress.zip.trim()};${userInfo.workAddress.country.trim()}`,
-              `LABEL;TYPE=WORK,PREF:${userInfo.workAddress.street.trim()}\n${userInfo.workAddress.city.trim()}, ${userInfo.workAddress.state.trim()} ${userInfo.workAddress.zip.trim()}\n${userInfo.workAddress.country.trim()}`,
-              `ADR;TYPE=HOME:;;${userInfo.homeAddress.street.trim()};${userInfo.homeAddress.city.trim()};${userInfo.homeAddress.state.trim()};${userInfo.homeAddress.zip.trim()};${userInfo.homeAddress.country.trim()}`,
-              `LABEL;TYPE=HOME:${userInfo.homeAddress.street.trim()}\n${userInfo.homeAddress.city.trim()}, ${userInfo.homeAddress.state.trim()} ${userInfo.homeAddress.zip.trim()}\n${userInfo.homeAddress.country.trim()}`,
               `EMAIL:${userInfo.email.trim()}`,
               `REV:${userInfo.revision.trim()}`,
               'END:VCARD'
             ].join('\r\n');
 
-            // Create a Blob and trigger download
             const blob = new Blob([vCard], { type: 'text/vcard' });
             const url = URL.createObjectURL(blob);
+
+            // Trigger file download
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'contact.vcf'; // Ensure the file has a .vcf extension
+            a.download = 'contact.vcf';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
 
-            // For iOS, open the contact app
+            // Handle iOS behavior to open contact app
             if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-              window.location.href = `data:text/vcard;base64,${btoa(vCard)}`;
+              setTimeout(() => {
+                window.location.href = `data:text/vcard;base64,${btoa(vCard)}`;
+              }, 1000); // Give time for the file to download before redirecting
             }
+
+            // Handle Android fallback for QR code readers
+            if (/Android/.test(navigator.userAgent)) {
+              setTimeout(() => {
+                window.open(url, '_blank');
+              }, 1000);
+            }
+
+            URL.revokeObjectURL(url);
           };
           reader.readAsDataURL(blob);
         })
         .catch(error => console.error('Error fetching image:', error));
     }
 
-    // Automatically generate and download the vCard when the page loads
     window.onload = generateVCard;
   </script>
 </head>
